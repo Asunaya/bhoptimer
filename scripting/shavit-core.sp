@@ -663,6 +663,16 @@ public void Player_Jump(Event event, const char[] name, bool dontBroadcast)
 	{
 		SetEntPropFloat(client, Prop_Data, "m_flLaggedMovementValue", view_as<float>(gA_StyleSettings[gBS_Style[client]][fSpeedMultiplier]));
 	}
+
+	// velocity limit
+	if(view_as<float>(gA_StyleSettings[gBS_Style[client]][fVelocityReductionRelative] > 0.0) &&
+	(!gB_Zones || !Shavit_InsideZone(client, Zone_NoVelLimit)))
+	{
+		float velocity[3];
+		GetEntPropVector(client, Prop_Data, "m_vecVelocity", velocity);
+		ScaleVector(velocity, 1.0 - gA_StyleSettings[gBS_Style[client]][fVelocityReductionRelative]);
+		TeleportEntity(client, NULL_VECTOR, NULL_VECTOR, velocity);
+	}
 }
 
 public void Player_Death(Event event, const char[] name, bool dontBroadcast)
@@ -1078,6 +1088,7 @@ bool LoadStyles()
 		gA_StyleSettings[i][bEasybhop] = dStyle.GetBool("easybhop", true);
 		gA_StyleSettings[i][bPrespeed] = dStyle.GetBool("prespeed", false);
 		gA_StyleSettings[i][fVelocityLimit] = dStyle.GetFloat("velocity_limit", 0.0);
+		gA_StyleSettings[i][fVelocityReductionRelative] = dStyle.GetFloat("velocity_reduction_relative", 0.0);
 		gA_StyleSettings[i][iAiraccelerate] = dStyle.GetInt("airaccelerate", 1000);
 		gA_StyleSettings[i][fRunspeed] = dStyle.GetFloat("runspeed", 260.00);
 		gA_StyleSettings[i][fGravityMultiplier] = dStyle.GetFloat("gravity", 1.0);
